@@ -12,18 +12,20 @@ namespace AutoAbsenSKI
             var rootCommand = new RootCommand
             {
                 new Option<bool>(new string[] { "--settings" , "-s" }, MessageResources.SettingsCommandDescription),
-                new Option<bool>(new string[] { "--install-scheduler", "-i" }, MessageResources.InstallSchedulerCommandDescription),
+                new Option<bool>(new string[] { "--install", "-i" }, MessageResources.InstallSchedulerCommandDescription),
+                new Option<bool>(new string[] { "--dry-run" , "-d" }, MessageResources.DryRunCommandDescription),
+                new Option<bool>(new string[] { "--no-headless" , "-n" }, MessageResources.DryRunCommandDescription),
             };
 
             rootCommand.Description = MessageResources.RootCommandDescription;
-            rootCommand.Handler = CommandHandler.Create<bool, bool, bool>(async (init, settings, installScheduler) =>
+            rootCommand.Handler = CommandHandler.Create<bool, bool, bool, bool>(async (settings, install, dryRun, noHeadless) =>
             {
                 try
                 {
                     var processor = new Processor();
 
                     Console.WriteLine(MessageResources.RootStatusLoading);
-                    await processor.Initialize();
+                    processor.Initialize();
 
                     if (settings)
                     {
@@ -31,21 +33,28 @@ namespace AutoAbsenSKI
                         return 0;
                     }
 
+                    await processor.DownloadChromium();
+
                     if (!processor.IsValidState())
                     {
                         Console.WriteLine(MessageResources.RootStatusInvalidState);
                         return -1;
                     }
 
-                    if (installScheduler)
+                    if (install)
                     {
                         await processor.InstallTaskScheduler();
                         return 0;
                     }
 
                     Console.WriteLine("### Generate and Send Report ###");
-                    var report = await processor.GenerateReport();
-                    await processor.SendEmail(report);
+                    var report = await processor.GenerateReport(!noHeadless);
+
+                    if (!dryRun)
+                    {
+                        await processor.SendEmail(report);
+                    }
+                    
                     return 0;
                 }
                 catch (Exception ex)

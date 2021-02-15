@@ -123,6 +123,9 @@
   <data name="DownloadChromiumStatus" xml:space="preserve">
     <value>Downloading chromium...</value>
   </data>
+  <data name="DryRunCommandDescription" xml:space="preserve">
+    <value>Generate report without sending it</value>
+  </data>
   <data name="GenerateReportLaunching" xml:space="preserve">
     <value>Launching a new instance of Chromium...</value>
   </data>

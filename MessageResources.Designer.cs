@@ -79,6 +79,15 @@ namespace AutoAbsenSKI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generate report without sending it.
+        /// </summary>
+        internal static string DryRunCommandDescription {
+            get {
+                return ResourceManager.GetString("DryRunCommandDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Launching a new instance of Chromium....
         /// </summary>
         internal static string GenerateReportLaunching {

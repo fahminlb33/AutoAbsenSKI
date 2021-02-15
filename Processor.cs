@@ -12,6 +12,7 @@ namespace AutoAbsenSKI
 {
     public class Processor
     {
+        private const int TimeoutDuration = 30 * 1000;
         private static readonly string SettingsPath = Path.Combine(AppContext.BaseDirectory, "settings.json");
         public JsonSettings _settings;
 
@@ -20,14 +21,9 @@ namespace AutoAbsenSKI
             return _settings.IsValidState();
         }
 
-        public async Task Initialize()
+        public void Initialize()
         {
             _settings = JsonSettings.Load(SettingsPath);
-            if (!File.Exists(_settings.ChromiumPath))
-            {
-                Console.WriteLine();
-                await DownloadChromium();
-            }
         }
 
         public void OpenSettings()
@@ -42,6 +38,7 @@ namespace AutoAbsenSKI
 
         public async Task DownloadChromium()
         {
+            if (File.Exists(_settings.ChromiumPath)) return;
             Console.WriteLine(MessageResources.DownloadChromiumStart);
 
             var fetcher = new BrowserFetcher();
@@ -50,12 +47,12 @@ namespace AutoAbsenSKI
             JsonSettings.Save(_settings, SettingsPath);
         }
 
-        public async Task<byte[]> GenerateReport()
+        public async Task<byte[]> GenerateReport(bool headless)
         {
             Console.WriteLine(MessageResources.GenerateReportLaunching);
             var opt = new LaunchOptions
             {
-                Headless = true,
+                Headless = headless,
                 Args = new[] { "--no-sandbox" },
                 DefaultViewport = new ViewPortOptions
                 {
@@ -73,19 +70,19 @@ namespace AutoAbsenSKI
 
             await page.TypeAsync("#username", _settings.AtlassianAccount.Email);
             await page.ClickAsync("#login-submit");
-            await page.WaitForTimeoutAsync(3 * 1000);
+            await page.WaitForSelectorAsync("#password", new WaitForSelectorOptions { Visible = true, Timeout = TimeoutDuration });
+
             await page.TypeAsync("#password", _settings.AtlassianAccount.Password);
             await page.ClickAsync("#login-submit");
-            await page.WaitForTimeoutAsync(5 * 1000);
+            await page.WaitForSelectorAsync("#jira-frontend", new WaitForSelectorOptions { Visible = true, Timeout = TimeoutDuration });
 
             Console.WriteLine(MessageResources.GenerateReportScreenshot);
-            await page.GoToAsync("https://telkomdds.atlassian.net/issues/?filter=11241");
-            await page.WaitForTimeoutAsync(3 * 1000);
+            await page.GoToAsync("https://telkomdds.atlassian.net/issues/?filter=11241", TimeoutDuration, new[] { WaitUntilNavigation.Networkidle0 });
             var img = await page.ScreenshotDataAsync();
 
 
             Console.WriteLine(MessageResources.GenerateReportLoggingOut);
-            await page.GoToAsync("https://telkomdds.atlassian.net/logout", 5 * 1000, new[] { WaitUntilNavigation.Networkidle0 });
+            await page.GoToAsync("https://telkomdds.atlassian.net/logout", TimeoutDuration, new[] { WaitUntilNavigation.Networkidle0 });
 
             await page.CloseAsync();
             await browser.CloseAsync();
@@ -191,7 +188,7 @@ namespace AutoAbsenSKI
         private static async Task SaveReport(byte[] data)
         {
             (string lastPeriod, string currentPeriod) = GetDatePeriod();
-            var filename = $"report-{lastPeriod}-{currentPeriod}";
+            var filename = $"report-{lastPeriod}-{currentPeriod}.jpg";
             await File.WriteAllBytesAsync(Path.Combine(AppContext.BaseDirectory, filename), data);
         }
     }
