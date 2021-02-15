@@ -50,7 +50,7 @@ namespace AutoAbsenSKI
             JsonSettings.Save(_settings, SettingsPath);
         }
 
-        public async Task<MemoryStream> GenerateReport()
+        public async Task<byte[]> GenerateReport()
         {
             Console.WriteLine(MessageResources.GenerateReportLaunching);
             var opt = new LaunchOptions
@@ -81,22 +81,21 @@ namespace AutoAbsenSKI
             Console.WriteLine(MessageResources.GenerateReportScreenshot);
             await page.GoToAsync("https://telkomdds.atlassian.net/issues/?filter=11241");
             await page.WaitForTimeoutAsync(3 * 1000);
-            var img = await page.ScreenshotStreamAsync();
+            var img = await page.ScreenshotDataAsync();
+
 
             Console.WriteLine(MessageResources.GenerateReportLoggingOut);
             await page.GoToAsync("https://telkomdds.atlassian.net/logout", 5 * 1000, new[] { WaitUntilNavigation.Networkidle0 });
 
-            var ms = new MemoryStream();
-            await img.CopyToAsync(img);
-            ms.Seek(0, SeekOrigin.Begin);
-
             await page.CloseAsync();
             await browser.CloseAsync();
 
-            return ms;
+            await SaveReport(img);
+
+            return img;
         }
 
-        public async Task SendEmail(Stream attachment)
+        public async Task SendEmail(byte[] attachment)
         {
             Console.WriteLine(MessageResources.SendEmailComposing);
             var sc = new SmtpClient
@@ -115,7 +114,8 @@ namespace AutoAbsenSKI
                 Body = $"Absen SKI atas nama {_settings.EmployeeName} periode {lastPeriod} s.d. {currentPeriod}"
             };
 
-            var attach = new Attachment(attachment, "absen.jpg", MediaTypeNames.Image.Jpeg);
+            using var ms = new MemoryStream(attachment);
+            var attach = new Attachment(ms, "absen.jpg", MediaTypeNames.Image.Jpeg);
             mail.Attachments.Add(attach);
 
             foreach (var recipient in _settings.Recipients)
@@ -186,6 +186,13 @@ namespace AutoAbsenSKI
             };
 
             return ($"{MonthToString(lastMonthDate.Month)} {lastMonthDate.Year}", $"{MonthToString(currentDate.Month)} {currentDate.Year}");
+        }
+
+        private static async Task SaveReport(byte[] data)
+        {
+            (string lastPeriod, string currentPeriod) = GetDatePeriod();
+            var filename = $"report-{lastPeriod}-{currentPeriod}";
+            await File.WriteAllBytesAsync(Path.Combine(AppContext.BaseDirectory, filename), data);
         }
     }
 }
