@@ -169,6 +169,15 @@ namespace AutoAbsenSKI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disable headless browser.
+        /// </summary>
+        internal static string NoHeadlessCommandDescription {
+            get {
+                return ResourceManager.GetString("NoHeadlessCommandDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Automatically create JIRA report for SKI administration and optionally create a scheduled task to automatically send report every 15th of each month..
         /// </summary>
         internal static string RootCommandDescription {

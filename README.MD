@@ -16,12 +16,12 @@ Usage:
   AutoAbsenSKI [options]
 
 Options:
-Options:
-  -s, --settings    Initialize/open settings
-  -i, --install     Install Task Scheduler to send report automatically
-  -d, --dry-run     Generate report without sending it
-  --version         Show version information
-  -?, -h, --help    Show help and usage information
+  -s, --settings       Initialize/open settings
+  -i, --install        Install Task Scheduler to send report automatically
+  -d, --dry-run        Generate report without sending it
+  -n, --no-headless    Disable headless browser
+  --version            Show version information
+  -?, -h, --help       Show help and usage information
 ```
 
 Note: Scheduler only works in Windows.

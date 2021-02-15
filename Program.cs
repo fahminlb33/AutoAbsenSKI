@@ -14,7 +14,7 @@ namespace AutoAbsenSKI
                 new Option<bool>(new string[] { "--settings" , "-s" }, MessageResources.SettingsCommandDescription),
                 new Option<bool>(new string[] { "--install", "-i" }, MessageResources.InstallSchedulerCommandDescription),
                 new Option<bool>(new string[] { "--dry-run" , "-d" }, MessageResources.DryRunCommandDescription),
-                new Option<bool>(new string[] { "--no-headless" , "-n" }, MessageResources.DryRunCommandDescription),
+                new Option<bool>(new string[] { "--no-headless" , "-n" }, MessageResources.NoHeadlessCommandDescription),
             };
 
             rootCommand.Description = MessageResources.RootCommandDescription;

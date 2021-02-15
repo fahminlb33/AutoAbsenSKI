@@ -153,6 +153,9 @@
   <data name="InstallSchedulerSuccess" xml:space="preserve">
     <value>Task installed successfully.</value>
   </data>
+  <data name="NoHeadlessCommandDescription" xml:space="preserve">
+    <value>Disable headless browser</value>
+  </data>
   <data name="RootCommandDescription" xml:space="preserve">
     <value>Automatically create JIRA report for SKI administration and optionally create a scheduled task to automatically send report every 15th of each month.</value>
   </data>
