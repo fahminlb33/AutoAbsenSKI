@@ -1,4 +1,4 @@
-﻿# AutoAbsenSKI
+﻿# AutoAbsenSKI ![.NET](https://github.com/fahminlb33/AutoAbsenSKI/workflows/.NET/badge.svg)
 
 This app is an automation tool to send my work progress from JIRA to email.
 While sending email every month is not much of a hassle, but if it can be
