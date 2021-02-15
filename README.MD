@@ -39,7 +39,7 @@ able to run this software. This app is compatible with Windows, OSX, and Linux.
 4. Save the settings file, then run `autoabsenski` without any arguments.
 5. The software will launch a Chromium browser using Pupeteer in the background
    and send the report as email.
-6. If you want to add Task Scheduler, execute `autoabsenski --install-scheduler`.
+6. If you want to add Task Scheduler, execute `autoabsenski --install`.
 
 ### Example Configuration
 
